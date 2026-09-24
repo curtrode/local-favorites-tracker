@@ -7,6 +7,10 @@ const favoritesList = document.getElementById('favorites-list');
 const searchInput = document.getElementById('search-input');
 const categoryFilter = document.getElementById('category-filter');
 
+const searchText = searchInput.value.toLowerCase().trim();
+const selectedCategory = categoryFilter.value;
+
+
 searchInput.addEventListener('input', searchFavorites);
 categoryFilter.addEventListener('change', searchFavorites);
 
@@ -30,11 +34,32 @@ function addFavorite(event) {
     };
 
     favorites.push(newFavorite);
+    saveFavorites();
+
+
     form.reset();
     displayFavorites();
 }
 
 form.addEventListener('submit', addFavorite);
+
+function saveFavorites() {
+    try {
+        localStorage.setItem('localFavorites', JSON.stringify(favorites));
+    } catch (error) {
+        alert('Unable to save favorites. Storage may be disabled.');
+    }
+}
+function loadFavorites() {
+    try {
+        const saved = localStorage.getItem('localFavorites');
+        favorites = saved ? JSON.parse(saved) : [];
+    } catch (error) {
+        favorites = [];
+    }
+}
+
+
 
 function displayFavorites() {
     searchInput.value = '';
@@ -47,6 +72,7 @@ function deleteFavorite(index) {
     const favorite = favorites[index];
     if (confirm(`Delete "${favorite.name}"?`)) {
         favorites.splice(index, 1);   // remove 1 item at index
+        saveFavorites();
         searchFavorites();            // re-render, keeping current filter
     }
 }
@@ -95,4 +121,5 @@ function searchFavorites() {
 
 
 // The last line in js/app.js
+loadFavorites();
 displayFavorites();
