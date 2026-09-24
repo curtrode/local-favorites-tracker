@@ -1,3 +1,29 @@
-# local-favorites-tracker
+# Local Favorites Tracker
 
-A tracker for saving favorite local places and finding them again. Project 2 for WRIT 40363.
+A small web app for saving favorite local places — coffee shops, pizza,
+restaurants, bars, parks, and shops — and finding them again. Project 2 for
+WRIT 40363 at TCU.
+
+**Live site:** https://curtrode.github.io/local-favorites-tracker/
+
+## What it does
+
+- Add a place with a name, category, star rating, and optional notes
+- Search names and notes as you type, and filter by category
+- Delete a favorite (with a confirmation step) without losing the current filter
+- Keep your favorites between visits, saved in the browser with `localStorage`
+
+## Built with
+
+- Semantic HTML5 with labeled form controls
+- CSS with design tokens for color, spacing, and type
+- Vanilla JavaScript: an array of objects, `filter`, template literals, and DOM events
+- `localStorage` and JSON for persistence
+- Git and GitHub Pages
+
+## Notes
+
+Favorites are stored only in the browser you add them from. They do not sync
+between devices, and clearing site data or using a private window starts you
+with an empty list. If the saved data is ever unreadable, the app starts empty
+instead of crashing.
