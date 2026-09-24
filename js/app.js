@@ -71,7 +71,7 @@ function searchFavorites() {
         return;
     }
     if (filtered.length === 0) {
-        favoritesList.innerHTML = '<p class="empty-message">No favorites match your search</p>';
+        favoritesList.innerHTML = '<p class="empty-message">No favorites match your search.</p>';
         return;
     }
 
