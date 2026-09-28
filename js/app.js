@@ -1,19 +1,83 @@
+// This is the top of my file js/app.js
+
 // At the very top of js/app.js, above your functions
+
+// 1. State
 let favorites = [];
 
+// 2. Page lookups
 const form = document.getElementById('add-favorite-form');
 const favoritesList = document.getElementById('favorites-list');
 
 const searchInput = document.getElementById('search-input');
 const categoryFilter = document.getElementById('category-filter');
 
-const searchText = searchInput.value.toLowerCase().trim();
-const selectedCategory = categoryFilter.value;
+// 3. Storage
+function saveFavorites() {
+    try {
+        localStorage.setItem('localFavorites', JSON.stringify(favorites));
+    } catch (error) {
+        alert('Unable to save favorites. Storage may be disabled.');
+    }
+}
 
+function loadFavorites() {
+    try {
+        const saved = localStorage.getItem('localFavorites');
+        favorites = saved ? JSON.parse(saved) : [];
+    } catch (error) {
+        favorites = [];
+    }
+}
 
-searchInput.addEventListener('input', searchFavorites);
-categoryFilter.addEventListener('change', searchFavorites);
+// 4. Drawing
+function searchFavorites() {
+    const searchText = searchInput.value.toLowerCase().trim();
+    const selectedCategory = categoryFilter.value;
 
+    const filtered = favorites.filter(function (favorite) {
+        const matchesSearch = searchText === '' ||
+            favorite.name.toLowerCase().includes(searchText) ||
+            favorite.notes.toLowerCase().includes(searchText);
+        const matchesCategory = selectedCategory === 'all' ||
+            favorite.category === selectedCategory;
+        return matchesSearch && matchesCategory;
+    });
+
+    favoritesList.innerHTML = '';
+
+    if (favorites.length === 0) {
+        favoritesList.innerHTML = '<p class="empty-message">No favorites yet. Add your first favorite place above!</p>';
+        return;
+    }
+    if (filtered.length === 0) {
+        favoritesList.innerHTML = '<p class="empty-message">No favorites match your search.</p>';
+        return;
+    }
+
+    filtered.forEach(function (favorite) {
+        const index = favorites.indexOf(favorite);
+        const stars = '⭐'.repeat(favorite.rating);
+
+        favoritesList.innerHTML += `
+            <div class="favorite-card">
+                <h3>${favorite.name}</h3>
+                <span class="favorite-category">${favorite.category}</span>
+                <div class="favorite-rating">${stars} (${favorite.rating}/5)</div>
+                <p class="favorite-notes">${favorite.notes}</p>
+                <p class="favorite-date">Added: ${favorite.dateAdded}</p>
+                <button class="btn-danger" onclick="deleteFavorite(${index})">Delete</button>
+            </div>`;
+    });
+}
+
+function displayFavorites() {
+    searchInput.value = '';
+    categoryFilter.value = 'all';
+    searchFavorites();
+}
+
+// 5. Actions
 function addFavorite(event) {
     event.preventDefault();
 
@@ -36,37 +100,9 @@ function addFavorite(event) {
     favorites.push(newFavorite);
     saveFavorites();
 
-
     form.reset();
     displayFavorites();
 }
-
-form.addEventListener('submit', addFavorite);
-
-function saveFavorites() {
-    try {
-        localStorage.setItem('localFavorites', JSON.stringify(favorites));
-    } catch (error) {
-        alert('Unable to save favorites. Storage may be disabled.');
-    }
-}
-function loadFavorites() {
-    try {
-        const saved = localStorage.getItem('localFavorites');
-        favorites = saved ? JSON.parse(saved) : [];
-    } catch (error) {
-        favorites = [];
-    }
-}
-
-
-
-function displayFavorites() {
-    searchInput.value = '';
-    categoryFilter.value = 'all';
-    searchFavorites();
-    }
-
 
 function deleteFavorite(index) {
     const favorite = favorites[index];
@@ -77,49 +113,12 @@ function deleteFavorite(index) {
     }
 }
 
-function searchFavorites() {
-    const searchText = searchInput.value.toLowerCase().trim();
-    const selectedCategory = categoryFilter.value;
+// 6. Listeners
+form.addEventListener('submit', addFavorite);
+searchInput.addEventListener('input', searchFavorites);
+categoryFilter.addEventListener('change', searchFavorites);
 
-    const filtered = favorites.filter(function(favorite) {
-        const matchesSearch = searchText === '' ||
-            favorite.name.toLowerCase().includes(searchText) ||
-            favorite.notes.toLowerCase().includes(searchText);
-        const matchesCategory = selectedCategory === 'all' ||
-            favorite.category === selectedCategory;
-        return matchesSearch && matchesCategory;
-    });
-
-    favoritesList.innerHTML = '';
-
-    if (favorites.length === 0) {
-        favoritesList.innerHTML = '<p class="empty-message">No favorites yet. Add your first favorite place above!</p>';
-        return;
-    }
-    if (filtered.length === 0) {
-        favoritesList.innerHTML = '<p class="empty-message">No favorites match your search.</p>';
-        return;
-    }
-
-    filtered.forEach(function(favorite) {
-    
-    const index = favorites.indexOf(favorite);
-    const stars = '⭐'.repeat(favorite.rating);
-
-    favoritesList.innerHTML += `
-        <div class="favorite-card">
-        <h3>${favorite.name}</h3>
-                <span class="favorite-category">${favorite.category}</span>
-                <div class="favorite-rating">${stars} (${favorite.rating}/5)</div>
-                <p class="favorite-notes">${favorite.notes}</p>
-                <p class="favorite-date">Added: ${favorite.dateAdded}</p>
-            <button class="btn-danger" onclick="deleteFavorite(${index})">Delete</button>
-        </div>`;
-});
-
-}
-
-
+// 7. Startup
 // The last line in js/app.js
 loadFavorites();
 displayFavorites();
